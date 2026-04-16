@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人物照合ツール</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      color: #222;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #111;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 14px;
+    }
+
+    /* Input fields */
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field input:focus { border-color: #06c755; }
+
+    /* Company checkboxes */
+    .company-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .company-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+      transition: background 0.1s, border-color 0.1s;
+      user-select: none;
+    }
+
+    .company-item:hover { background: #f9f9f9; }
+
+    .company-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #06c755;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-generate {
+      background: #06c755;
+      color: #fff;
+      width: 100%;
+    }
+    .btn-generate:hover:not(:disabled) { background: #05b34c; }
+
+    .btn-copy {
+      background: #f0f0f0;
+      color: #333;
+      font-size: 13px;
+      padding: 8px 14px;
+      flex: 1;
+    }
+    .btn-copy:hover { background: #e0e0e0; }
+
+    .btn-line {
+      background: #06c755;
+      color: #fff;
+      font-size: 13px;
+      padding: 8px 14px;
+      flex: 1;
+      text-decoration: none;
+    }
+    .btn-line:hover { background: #05b34c; }
+
+    .divider { border: none; border-top: 1px solid #eee; margin: 14px 0; }
+
+    /* Result blocks */
+    .result-block {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .result-block:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .result-company {
+      font-size: 13px;
+      font-weight: 700;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .result-msg {
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .result-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .copied-label {
+      color: #06c755;
+      font-size: 12px;
+      margin-left: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📋 人物照合ツール</h1>
+
+  <!-- 求職者情報 -->
+  <div class="card">
+    <div class="card-title">求職者情報</div>
+    <div class="field">
+      <label>氏名</label>
+      <input type="text" id="name" placeholder="山田太郎" />
+    </div>
+    <div class="field">
+      <label>フリガナ</label>
+      <input type="text" id="kana" placeholder="ヤマダタロウ" />
+    </div>
+    <div class="field">
+      <label>生年月日</label>
+      <input type="text" id="dob" placeholder="1990/04/17" />
+    </div>
+    <div class="field">
+      <label>電話番号</label>
+      <input type="tel" id="tel" placeholder="09012345678" />
+    </div>
+  </div>
+
+  <!-- 送り先 -->
+  <div class="card">
+    <div class="card-title">送り先を選択</div>
+    <div class="company-grid" id="companyList"></div>
+    <hr class="divider">
+    <button class="btn btn-generate" onclick="generate()">メッセージを生成</button>
+  </div>
+
+  <!-- 結果 -->
+  <div class="card" id="resultsCard" style="display:none">
+    <div class="card-title">生成されたメッセージ</div>
+    <div id="resultsBody"></div>
+  </div>
+</div>
+
+<script>
+  // 派遣会社リスト
+  const COMPANIES = [
+    { name: 'BREXA',    url: 'https://line.me/ti/g/usZPCy9C_D' },
+    { name: 'WITC',     url: 'https://line.me/ti/g/EQw8MhxNeh' },
+    { name: '東洋ワーク', url: 'https://line.me/ti/g/5UpGbEmYPa' },
+    { name: 'アドバンティア', url: 'https://line.me/ti/g/R_6nJ7-LxA' },
+    { name: 'アスタリスク', url: 'https://line.me/ti/g/GrZK-AAAm2' },
+    { name: '高木工業',  url: 'https://line.me/ti/g/cyCEwLzcj9' },
+    { name: '綜合キャリア', url: 'https://line.me/ti/g/CC77QExtRS' },
+    { name: '新日本',   url: 'https://line.me/ti/g/NcuKSbdHdn' },
+    { name: 'エンドウハウゼ', url: 'https://line.me/ti/g/WxxV3PnS85' },
+    { name: 'Man to Man', url: 'https://line.me/ti/g/KJ_BBRqWnx' },
+  ];
+
+  // チェックボックスを生成
+  const companyList = document.getElementById('companyList');
+  COMPANIES.forEach((c, i) => {
+    const label = document.createElement('label');
+    label.className = 'company-item';
+    label.innerHTML = `
+      <input type="checkbox" id="c${i}" value="${i}" />
+      ${c.name}
+    `;
+    companyList.appendChild(label);
+  });
+
+  function buildMessage(name, kana, dob, tel) {
+    return `お世話になっております。\nこちらの方、人物照合をお願いいたします。\n\n${name}\n${kana}\n${dob}\n${tel}`;
+  }
+
+  function generate() {
+    const name = document.getElementById('name').value.trim();
+    const kana = document.getElementById('kana').value.trim();
+    const dob  = document.getElementById('dob').value.trim();
+    const tel  = document.getElementById('tel').value.trim();
+
+    if (!name || !kana || !dob || !tel) {
+      alert('すべての項目を入力してください');
+      return;
+    }
+
+    const selected = [...document.querySelectorAll('#companyList input:checked')]
+      .map(cb => COMPANIES[parseInt(cb.value)]);
+
+    if (selected.length === 0) {
+      alert('送り先を1社以上選択してください');
+      return;
+    }
+
+    const msg = buildMessage(name, kana, dob, tel);
+    const resultsCard = document.getElementById('resultsCard');
+    const resultsBody = document.getElementById('resultsBody');
+    resultsCard.style.display = 'block';
+
+    resultsBody.innerHTML = selected.map((c, i) => `
+      <div class="result-block">
+        <div class="result-company">${c.name}</div>
+        <div class="result-msg" id="msg${i}">${escapeHtml(msg)}</div>
+        <div class="result-actions">
+          <button class="btn btn-copy" onclick="copyMsg(${i}, this)">コピー</button>
+          <a class="btn btn-line" href="${c.url}" target="_blank">LINEを開く</a>
+        </div>
+      </div>
+    `).join('');
+
+    resultsCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copyMsg(index, btn) {
+    const text = document.getElementById(`msg${index}`).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'コピーしました！';
+      setTimeout(() => btn.textContent = 'コピー', 2000);
+    });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+</script>
+</body>
+</html>
