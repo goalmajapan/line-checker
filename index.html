@@ -279,18 +279,36 @@
     const resultsBody = document.getElementById('resultsBody');
     resultsCard.style.display = 'block';
 
-    resultsBody.innerHTML = selected.map((c, i) => `
+    // 選択会社のURLをdata属性に保存して一括開くボタンで使う
+    const urls = selected.map(c => c.url);
+
+    resultsBody.innerHTML = `
+      <div style="margin-bottom:16px">
+        <button class="btn btn-line" style="width:100%" onclick="openAllLine(${JSON.stringify(urls).replace(/"/g, '&quot;')})">全部のLINEを開く</button>
+      </div>
+    ` + selected.map((c, i) => `
       <div class="result-block">
         <div class="result-company">${c.name}</div>
         <div class="result-msg" id="msg${i}">${escapeHtml(msg)}</div>
         <div class="result-actions">
           <button class="btn btn-copy" onclick="copyMsg(${i}, this)">コピー</button>
-          <a class="btn btn-line" href="${c.url}" target="_blank">LINEを開く</a>
+          <a class="btn btn-line" href="${c.url}">LINEを開く</a>
         </div>
       </div>
     `).join('');
 
     resultsCard.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function openAllLine(urls) {
+    // 300msずつずらして順番に開く
+    urls.forEach((url, i) => {
+      setTimeout(() => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.click();
+      }, i * 300);
+    });
   }
 
   function copyMsg(index, btn) {
