@@ -279,30 +279,20 @@
     const resultsBody = document.getElementById('resultsBody');
     resultsCard.style.display = 'block';
 
-    const urls = selected.map(c => c.url);
-
-    resultsBody.innerHTML = `
-      <div class="result-msg" id="msg0">${escapeHtml(msg)}</div>
-      <div class="result-actions" style="margin-top:10px">
-        <button class="btn btn-copy" onclick="copyMsg(0, this)">コピー</button>
-        <button class="btn btn-line" onclick="openAllLine(${JSON.stringify(urls).replace(/"/g, '&quot;')})">LINEを開く</button>
+    resultsBody.innerHTML = selected.map((c, i) => `
+      <div class="result-block">
+        <div class="result-company">${c.name}</div>
+        <div class="result-actions">
+          <button class="btn btn-copy" onclick="copyMsg('${escapeHtml(msg)}', this)">コピー</button>
+          <a class="btn btn-line" href="${c.url}">LINEを開く</a>
+        </div>
       </div>
-    `;
+    `).join('');
 
     resultsCard.scrollIntoView({ behavior: 'smooth' });
   }
 
-  function openAllLine(urls) {
-    // 300msずつずらして順番に開く
-    urls.forEach(url => {
-      const a = document.createElement('a');
-      a.href = url;
-      a.click();
-    });
-  }
-
-  function copyMsg(index, btn) {
-    const text = document.getElementById(`msg${index}`).textContent;
+  function copyMsg(text, btn) {
     navigator.clipboard.writeText(text).then(() => {
       btn.textContent = 'コピーしました！';
       setTimeout(() => btn.textContent = 'コピー', 2000);
