@@ -279,10 +279,13 @@
     const resultsBody = document.getElementById('resultsBody');
     resultsCard.style.display = 'block';
 
+    // メッセージをグローバル変数に保持してコピーで参照
+    window._currentMsg = msg;
+
     resultsBody.innerHTML = `
       <div class="result-msg">${escapeHtml(msg)}</div>
       <div style="margin:10px 0 16px">
-        <button class="btn btn-copy" onclick="copyMsg('${escapeHtml(msg)}', this)">コピー</button>
+        <button class="btn btn-copy" id="copyBtn" onclick="copyMsg(this)">コピー</button>
       </div>
       <hr class="divider">
       ${selected.map(c => `
@@ -298,8 +301,8 @@
     resultsCard.scrollIntoView({ behavior: 'smooth' });
   }
 
-  function copyMsg(text, btn) {
-    navigator.clipboard.writeText(text).then(() => {
+  function copyMsg(btn) {
+    navigator.clipboard.writeText(window._currentMsg).then(() => {
       btn.textContent = 'コピーしました！';
       setTimeout(() => btn.textContent = 'コピー', 2000);
     });
