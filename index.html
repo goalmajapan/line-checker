@@ -279,23 +279,15 @@
     const resultsBody = document.getElementById('resultsBody');
     resultsCard.style.display = 'block';
 
-    // 選択会社のURLをdata属性に保存して一括開くボタンで使う
     const urls = selected.map(c => c.url);
 
     resultsBody.innerHTML = `
-      <div style="margin-bottom:16px">
-        <button class="btn btn-line" style="width:100%" onclick="openAllLine(${JSON.stringify(urls).replace(/"/g, '&quot;')})">全部のLINEを開く</button>
+      <div class="result-msg" id="msg0">${escapeHtml(msg)}</div>
+      <div class="result-actions" style="margin-top:10px">
+        <button class="btn btn-copy" onclick="copyMsg(0, this)">コピー</button>
+        <button class="btn btn-line" onclick="openAllLine(${JSON.stringify(urls).replace(/"/g, '&quot;')})">全部のLINEを開く</button>
       </div>
-    ` + selected.map((c, i) => `
-      <div class="result-block">
-        <div class="result-company">${c.name}</div>
-        <div class="result-msg" id="msg${i}">${escapeHtml(msg)}</div>
-        <div class="result-actions">
-          <button class="btn btn-copy" onclick="copyMsg(${i}, this)">コピー</button>
-          <a class="btn btn-line" href="${c.url}">LINEを開く</a>
-        </div>
-      </div>
-    `).join('');
+    `;
 
     resultsCard.scrollIntoView({ behavior: 'smooth' });
   }
