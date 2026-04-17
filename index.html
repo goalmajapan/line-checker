@@ -279,16 +279,21 @@
     const resultsBody = document.getElementById('resultsBody');
     resultsCard.style.display = 'block';
 
-    resultsBody.innerHTML = selected.map((c, i) => `
-      <div class="result-block">
-        <div class="result-company">${c.name}</div>
-        <div class="result-msg">${escapeHtml(msg)}</div>
-        <div class="result-actions">
-          <button class="btn btn-copy" onclick="copyMsg('${escapeHtml(msg)}', this)">コピー</button>
-          <a class="btn btn-line" href="${c.url}">LINEを開く</a>
-        </div>
+    resultsBody.innerHTML = `
+      <div class="result-msg">${escapeHtml(msg)}</div>
+      <div style="margin:10px 0 16px">
+        <button class="btn btn-copy" onclick="copyMsg('${escapeHtml(msg)}', this)">コピー</button>
       </div>
-    `).join('');
+      <hr class="divider">
+      ${selected.map(c => `
+        <div class="result-block">
+          <div class="result-actions">
+            <span style="flex:1;font-size:14px;font-weight:600">${c.name}</span>
+            <a class="btn btn-line" href="${c.url}">LINEを開く</a>
+          </div>
+        </div>
+      `).join('')}
+    `;
 
     resultsCard.scrollIntoView({ behavior: 'smooth' });
   }
