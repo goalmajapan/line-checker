@@ -294,12 +294,10 @@
 
   function openAllLine(urls) {
     // 300msずつずらして順番に開く
-    urls.forEach((url, i) => {
-      setTimeout(() => {
-        const a = document.createElement('a');
-        a.href = url;
-        a.click();
-      }, i * 100);
+    urls.forEach(url => {
+      const a = document.createElement('a');
+      a.href = url;
+      a.click();
     });
   }
 
