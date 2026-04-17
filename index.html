@@ -282,6 +282,7 @@
     resultsBody.innerHTML = selected.map((c, i) => `
       <div class="result-block">
         <div class="result-company">${c.name}</div>
+        <div class="result-msg">${escapeHtml(msg)}</div>
         <div class="result-actions">
           <button class="btn btn-copy" onclick="copyMsg('${escapeHtml(msg)}', this)">コピー</button>
           <a class="btn btn-line" href="${c.url}">LINEを開く</a>
